@@ -1,0 +1,65 @@
+﻿@model List<WebShopQuanAo.Models.AdminSanPhamVM>
+
+@{
+    ViewBag.Title = "Quản lý sản phẩm";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="p-4">
+    <!-- Tiêu đề -->
+    <h2 class="fw-bold mb-3 text-center">Quản lý sản phẩm</h2>
+
+    <!-- Nút thêm sản phẩm -->
+    <div class="text-start mb-4">
+        <a href="/Admin/Create" class="btn btn-success">
+            <i class="bi bi-plus-lg"></i> Thêm sản phẩm
+        </a>
+    </div>
+
+    <!-- Bảng sản phẩm -->
+    <table class="table table-bordered table-striped align-middle">
+        <thead class="table-dark text-center">
+            <tr>
+                <th style="width:120px;">Hình</th>
+                <th>Tên SP</th>
+                <th>Danh mục</th>
+                <th>Giá</th>
+                <th>Tồn kho</th>
+                <th>Hiển thị</th>
+                <th>Cập nhật</th>
+                <th style="width:140px;">Thao tác</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var sp in Model)
+            {
+                <tr>
+                    <td class="text-center">
+                        <img src="@Url.Content("~/Images/Products/" + sp.HinhDaiDien)" class="img-fluid rounded" style="max-height:80px;" />
+                    </td>
+
+                    <td>@sp.TenSP</td>
+                    <td>@sp.DanhMuc</td>
+                    <td>@String.Format("{0:N0}₫", sp.Gia)</td>
+                    <td class="text-center fw-bold">@sp.TongTon</td>
+                    <td class="text-center">
+                        @if (sp.HienThi)
+                        {
+                            <span class="badge bg-success">Hiển thị</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Ẩn</span>
+                        }
+                    </td>
+                    <td>@sp.NgayTao.ToString("dd/MM/yyyy")</td>
+                    <td class="text-center">
+                        <a href="/Admin/Edit/@sp.MaSP" class="btn btn-sm btn-warning">Sửa</a>
+                        <a href="/Admin/Delete/@sp.MaSP" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này?');">Xóa</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

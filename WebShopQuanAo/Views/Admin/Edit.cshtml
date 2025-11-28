@@ -1,0 +1,108 @@
+﻿@model WebShopQuanAo.Models.EditSanPhamVM
+@{
+    ViewBag.Title = "Sửa sản phẩm";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container my-5">
+    <div class="card shadow rounded-4 p-4">
+        <!-- Tiêu đề -->
+        <h3 class="card-title mb-4 text-center fw-bold">Sửa sản phẩm</h3>
+
+        <!-- Form sửa sản phẩm -->
+        @using (Html.BeginForm("Edit", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(m => m.MaSP)
+
+            <div class="mb-3">
+                @Html.LabelFor(m => m.TenSP, "Tên sản phẩm", new { @class = "fw-bold" })
+                @Html.TextBoxFor(m => m.TenSP, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.TenSP, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="mb-3">
+                @Html.LabelFor(m => m.MaDanhMuc, "Danh mục", new { @class = "fw-bold" })
+                @Html.DropDownListFor(m => m.MaDanhMuc, (SelectList)ViewBag.DanhMuc, "Chọn danh mục", new { @class = "form-select" })
+                @Html.ValidationMessageFor(m => m.MaDanhMuc, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="mb-3">
+                @Html.LabelFor(m => m.Gia, "Giá sản phẩm", new { @class = "fw-bold" })
+                @Html.TextBoxFor(m => m.Gia, new { @class = "form-control", type = "number" })
+                @Html.ValidationMessageFor(m => m.Gia, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="mb-3">
+                @Html.LabelFor(m => m.SoLuongTon, "Số lượng tồn", new { @class = "fw-bold" })
+                @Html.TextBoxFor(m => m.SoLuongTon, new { @class = "form-control", type = "number", min = "0" })
+                @Html.ValidationMessageFor(m => m.SoLuongTon, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="mb-3">
+                @Html.LabelFor(m => m.ChatLieu, "Chất liệu", new { @class = "fw-bold" })
+                @Html.TextBoxFor(m => m.ChatLieu, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.ChatLieu, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="mb-3">
+                @Html.LabelFor(m => m.Form, "Form dáng", new { @class = "fw-bold" })
+                @Html.TextBoxFor(m => m.Form, new { @class = "form-control" })
+            </div>
+
+            <div class="mb-3">
+                @Html.LabelFor(m => m.MoTaChiTiet, "Mô tả chi tiết", new { @class = "fw-bold" })
+                @Html.TextAreaFor(m => m.MoTaChiTiet, new { @class = "form-control", rows = 4 })
+                @Html.ValidationMessageFor(m => m.MoTaChiTiet, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="mb-3">
+                <label class="fw-bold">Hiển thị</label><br />
+                @Html.ValidationMessageFor(m => m.HienThi, "", new { @class = "text-danger" })
+
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="HienThi" id="hienThi1" value="true" @(Model.HienThi ? "checked" : "")>
+                    <label class="form-check-label" for="hienThi1">Hiển thị</label>
+                </div>
+
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="HienThi" id="hienThi0" value="false" @(!Model.HienThi ? "checked" : "")>
+                    <label class="form-check-label" for="hienThi0">Ẩn</label>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="fw-bold">Ảnh đại diện</label>
+                <div class="mb-2">
+                    <img src="~/Images/Products/@Model.HinhDaiDien" alt="Hình đại diện" width="150" />
+                </div>
+                <input type="file" name="HinhDaiDienFile" class="form-control" />
+                <small class="text-muted">Nếu không chọn file mới, hình cũ sẽ giữ nguyên.</small>
+            </div>
+
+            <div class="mb-3">
+                <label class="fw-bold">Ảnh hover</label>
+                <input type="file" name="HinhHover" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label class="fw-bold">Ảnh phụ 1</label>
+                <input type="file" name="HinhPhu1" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label class="fw-bold">Ảnh phụ 2</label>
+                <input type="file" name="HinhPhu2" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label class="fw-bold">Ảnh phụ 3</label>
+                <input type="file" name="HinhPhu3" class="form-control" />
+            </div>
+
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary px-5 fw-bold">Cập nhật sản phẩm</button>
+            </div>
+        }
+    </div>
+</div>

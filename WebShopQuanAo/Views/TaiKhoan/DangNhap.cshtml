@@ -1,0 +1,51 @@
+﻿@model WebShopQuanAo.Models.DangNhapViewModel
+@{
+    ViewBag.Title = "Đăng nhập";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container d-flex justify-content-center align-items-center" style="min-height: calc(100vh - 250px);">
+    <div class="card login-card p-4" style="width: 100%; max-width: 400px;">
+        <h3 class="text-center mb-4 fw-bold" style="color: #FFA500">Đăng Nhập</h3>
+
+        @using (Html.BeginForm("DangNhap", "TaiKhoan", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger mb-3" })
+
+            <div class="mb-3">
+                @Html.LabelFor(m => m.Email, htmlAttributes: new { @class = "form-label fw-semibold" })
+                @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Email của bạn" })
+                @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="mb-3">
+                @Html.LabelFor(m => m.Password, htmlAttributes: new { @class = "form-label fw-semibold" })
+                <div class="input-group">
+                    @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Mật khẩu", id = "passwordInput" })
+                    <span class="input-group-text" id="togglePassword"><i class="bi bi-eye"></i></span>
+                </div>
+                @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+            </div>
+
+            <button type="submit" class="btn btn-login w-100 rounded-3 fw-bold">ĐĂNG NHẬP</button>
+        }
+
+        <p class="text-center mt-3 mb-0">
+            Chưa có tài khoản? @Html.ActionLink("Đăng ký ngay", "DangKy", "TaiKhoan", null, new { @class = "text-primary fw-semibold text-decoration-none" })
+        </p>
+    </div>
+</div>
+
+<!-- Mắt ẩn hiện mật khẩu -->
+<script>
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('passwordInput');
+
+    togglePassword.addEventListener('click', function () {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        this.querySelector('i').classList.toggle('bi-eye');
+        this.querySelector('i').classList.toggle('bi-eye-slash');
+    });
+</script>

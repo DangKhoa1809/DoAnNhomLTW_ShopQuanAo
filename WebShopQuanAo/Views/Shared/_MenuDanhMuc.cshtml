@@ -1,0 +1,72 @@
+﻿@model IEnumerable<WebShopQuanAo.Models.DanhMuc>
+@using WebShopQuanAo.Models
+@{
+    var db = new QL_ShopQuanAoEntities();
+    var all = db.DanhMucs.ToList();
+    var danhMucCha = all.Where(x => x.MaDanhMucCha == null).OrderBy(x => x.MaDanhMuc).ToList();
+}
+
+<ul class="navbar-nav mx-auto text-uppercase fw-bold" style="gap: 1.8rem;">
+    <li class="nav-item"><a class="nav-link text-danger" href="/hang-moi">NEW</a></li>
+
+    <li class="nav-item dropdown">
+        <a class="nav-link text-dark" href="/tat-ca">SẢN PHẨM <i class="bi bi-caret-down-fill ms-2 d-none d-lg-inline"></i></a>
+
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item py-3" href="/tat-ca">TẤT CẢ SẢN PHẨM</a></li>
+            <li><a class="dropdown-item py-3" href="/hang-ban-chay"><i class="bi bi-fire text-danger me-2"></i>HÀNG BÁN CHẠY</a></li>
+            <li><hr class="dropdown-divider"></li>
+
+            @* Danh mục cha *@
+            @foreach (var dm in danhMucCha)
+            {
+                var con = all.Where(x => x.MaDanhMucCha == dm.MaDanhMuc).ToList();
+
+                if (con.Any())
+                {
+                    <li class="dropdown-submenu dropend">
+                        <a class="dropdown-item dropdown-toggle py-3" href="/danh-muc/@dm.Slug">
+                            @dm.TenDanhMuc
+                        </a>
+
+                        <ul class="dropdown-menu">
+                            @foreach (var c in con)
+                            {
+                                <li><a class="dropdown-item py-3" href="/danh-muc/@c.Slug">@c.TenDanhMuc</a></li>
+                            }
+                        </ul>
+                    </li>
+                }
+                else
+                {
+                    <li><a class="dropdown-item py-3" href="/danh-muc/@dm.Slug">@dm.TenDanhMuc</a></li>
+                }
+            }
+        </ul>
+    </li>
+
+
+    <!-- ÁO NAM - QUẦN NAM - PHỤ KIỆN -->
+    @foreach (var dm in danhMucCha)
+    {
+        var con = all.Where(x => x.MaDanhMucCha == dm.MaDanhMuc).ToList();
+
+        if (con.Any())
+        {
+            <li class="nav-item dropdown">
+                <a class="nav-link text-dark" href="/danh-muc/@dm.Slug">
+                    @(dm.TenDanhMuc == "Áo" ? "ÁO NAM" : dm.TenDanhMuc == "Quần" ? "QUẦN NAM" : dm.TenDanhMuc == "Phụ kiện" ? "PHỤ KIỆN" : dm.TenDanhMuc)
+                    <i class="bi bi-caret-down-fill ms-2 d-none d-lg-inline"></i>
+                </a>
+
+                <ul class="dropdown-menu">
+                    @foreach (var c in con)
+                    {
+                        <li><a class="dropdown-item py-3" href="/danh-muc/@c.Slug">@c.TenDanhMuc</a></li>
+                    }
+                </ul>
+            </li>
+
+        }
+    }
+</ul>

@@ -1,0 +1,206 @@
+﻿@model List<WebShopQuanAo.Models.CartItem>
+
+@{
+    ViewBag.Title = "Thanh toán";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container my-5">
+    <div class="row">
+        <!-- Cột trái: form -->
+        <div class="col-lg-6">
+            <h3 class="mb-3 fw-bold">Thông tin đơn hàng</h3>
+            <form method="post" action="@Url.Action("DatHang","GioHang")">
+                <div class="mb-3">
+                    <label class="fw-bold">Họ tên</label>
+                    <input name="tenKH" class="form-control" required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="fw-bold">Số điện thoại</label>
+                    <input name="phone" class="form-control" required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="fw-bold">Địa chỉ giao hàng</label>
+                    <input name="diaChi" class="form-control" required />
+                </div>
+
+                <h3 class="mt-3 fw-bold">Phương thức vận chuyển</h3>
+
+                <label class="select-box">
+                    <input type="radio" name="PhuongThucVC" value="FREESHIP" checked>
+                    <div class="select-content">
+                        <strong>Freeship đơn hàng</strong>
+                    </div>
+                </label>
+
+                <h3 class="mt-3 fw-bold">Hình thức thanh toán</h3>
+
+                <label class="select-box">
+                    <input type="radio" name="HinhThucThanhToan" value="COD" checked>
+                    <div class="select-content">
+                        <strong>Thanh toán khi giao hàng (COD)</strong>
+                        <p class="small m-0 text-muted">Khách hàng được kiểm tra hàng trước khi nhận.</p>
+                    </div>
+                </label>
+
+                <label class="select-box">
+                    <input type="radio" name="HinhThucThanhToan" value="VNPAY">
+                    <div class="select-content">
+                        <strong>Ví điện tử VNPAY</strong>
+                    </div>
+                </label>
+
+                <label class="select-box">
+                    <input type="radio" name="HinhThucThanhToan" value="MOMO">
+                    <div class="select-content">
+                        <strong>Thanh toán MoMo</strong>
+                    </div>
+                </label>
+
+                <button class="btn btn-dark w-100 mt-3 pay-btn fw-bold" type="submit">THANH TOÁN</button>
+            </form>
+        </div>
+
+        <!-- Cột phải: giỏ hàng -->
+        <div class="col-lg-6">
+            <h3 class="mb-3 fw-bold"> <i class="bi bi-cart3"></i> Giỏ hàng</h3>
+
+            @foreach (var item in Model)
+            {
+                <div id="cart-item-@item.MaSP-@item.MauSac-@item.Size" class="d-flex mb-3 border-bottom pb-2 align-items-start position-relative">
+                    <img src="@(!string.IsNullOrEmpty(item.HinhAnh) ? item.HinhAnh : "/Images/Products/no-image.png")" style="width:150px;height:150px;object-fit:cover" class="rounded-3 me-3" />
+
+                    <div class="flex-grow-1 d-flex flex-column justify-content-between" style="min-width: 0;">
+                        <div>
+                            <p class="m-0 fw-bold fs-4 text-truncate" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; display:block;" title="@item.TenSP">
+                                @item.TenSP
+                            </p>
+
+                            <small class="text-dark fs-5">Màu: @item.MauSac | Size: @item.Size</small>
+                        </div>
+
+                        <div class="d-flex align-items-center mt-2">
+                            <button type="button" class="btn btn-outline-dark btn-sm me-1" onclick="updateQty(@item.MaSP, '@item.MauSac', '@item.Size', -1)">
+                                -
+                            </button>
+
+                            <input type="number" min="1" class="form-control text-center me-1 no-spin" style="width:60px;" value="@item.SoLuong" id="qty-@item.MaSP-@item.MauSac-@item.Size" onchange="updateQtyDirect(@item.MaSP, '@item.MauSac', '@item.Size')" />
+
+                            <button type="button" class="btn btn-outline-dark btn-sm me-3" onclick="updateQty(@item.MaSP, '@item.MauSac', '@item.Size', 1)">
+                                +
+                            </button>
+                        </div>
+
+                        <div class="mt-1 d-flex justify-content-between align-items-center">
+                            <span class="fw-bold fs-4" style="color: red;" id="price-@item.MaSP-@item.MauSac-@item.Size">
+                                @item.ThanhTien.ToString("N0")₫
+                            </span>
+
+                            <button type="button" class="btn btn-outline-dark btn-sm fw-bold mt-auto btn-remove rounded-3" onclick="removeFromCart(@item.MaSP, '@item.MauSac', '@item.Size')">
+                                Xóa
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <h2 class="text-end mt-3 fw-bold">
+                Tổng cộng:
+                <span id="totalPrice" style="color: red">@Model.Sum(x => x.ThanhTien).ToString("N0")₫</span>
+            </h2>
+        </div>
+    </div>
+</div>
+
+<script>
+    //Xóa sản phẩm khỏi giỏ hàng
+    function removeFromCart(maSP, mau, size) {
+        if (!confirm("Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?")) return;
+
+        fetch('/GioHang/XoaSanPham', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ maSP: maSP, mau: mau, size: size })
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const elem = document.getElementById(`cart-item-${maSP}-${mau}-${size}`);
+                    if (elem) elem.remove();
+
+                    updateTotalPrice();
+
+                    const cartCount = document.getElementById("cartCount");
+                    if (cartCount) cartCount.innerText = data.totalQty;
+
+                    if (data.cartEmpty) {
+                        const cartContainer = document.querySelector('.col-lg-6:last-child');
+                        cartContainer.innerHTML = '<h3 class="mb-3 fw-bold">Giỏ hàng trống</h3>';
+                    }
+                }
+            });
+    }
+
+
+    // Tính lại tổng tiền
+    function updateTotalPrice() {
+        let total = 0;
+        document.querySelectorAll('[id^="price-"]').forEach(span => {
+            const text = span.innerText.replace(/\D/g, ''); 
+            total += parseInt(text) || 0;
+        });
+        const totalSpan = document.getElementById('totalPrice');
+        if (totalSpan) totalSpan.innerText = total.toLocaleString() + ' ₫';
+    }
+
+    //Cập nhật số lượng thay đổi
+    function updateQty(maSP, mau, size, change) {
+        let input = document.getElementById("qty-" + maSP + "-" + mau + "-" + size);
+        let val = parseInt(input.value) + change;
+
+        if (val < 1) val = 1;
+        input.value = val;
+
+        capNhatSoLuong(maSP, mau, size, val);
+    }
+
+    //Cập nhật số lượng thay đổi bằng nhập trực tiếp
+    function updateQtyDirect(maSP, mau, size) {
+        let input = document.getElementById("qty-" + maSP + "-" + mau + "-" + size);
+        let val = parseInt(input.value);
+
+        if (isNaN(val) || val < 1) val = 1;
+        input.value = val;
+
+        capNhatSoLuong(maSP, mau, size, val);
+    }
+
+    //Cập nhật số lượng
+    function capNhatSoLuong(maSP, mau, size, soLuong) {
+        fetch('/GioHang/CapNhatSoLuong', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ maSP: maSP, mau: mau, size: size, soLuong: soLuong })
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) return;
+
+                let priceSpan = document.getElementById(`price-${maSP}-${mau}-${size}`);
+                if (priceSpan)
+                    priceSpan.innerText = data.thanhTien.toLocaleString() + "₫";
+
+                let totalSpan = document.getElementById("totalPrice");
+                if (totalSpan)
+                    totalSpan.innerText = data.totalPrice.toLocaleString() + " ₫";
+
+                const cartCount = document.getElementById("cartCount");
+                if (cartCount)
+                    cartCount.innerText = data.totalQty;
+            });
+    }
+</script>

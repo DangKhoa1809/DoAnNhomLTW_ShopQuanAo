@@ -1,0 +1,460 @@
+﻿@model WebShopQuanAo.Models.SanPham
+
+@{
+    ViewBag.Title = "Chi tiết sản phẩm";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container my-5">
+    <div class="row g-4">
+        <!-- Card trái: ảnh sản phẩm -->
+        <div class="col-lg-6">
+            <div class="card shadow-sm p-3 rounded-4">
+                <div class="position-relative">
+                    <button class="image-nav-btn image-nav-left" onclick="prevImage()">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+
+                    <img id="mainImage" src="@Url.Content("~/Images/Products/" + Model.HinhDaiDien)" class="img-fluid w-100 rounded-4" />
+
+                    <button class="image-nav-btn image-nav-right" onclick="nextImage()">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                </div>
+
+                <div class="thumb-scroll mt-3">
+                    @foreach (var img in Model.HinhAnhSanPhams.OrderBy(x => x.ThuTuHinh))
+                    {
+                        <img src="@Url.Content("~/Images/Products/" + img.TenHinh)" class="img-thumbnail rounded-3 img-thumb" data-img="@Url.Content("~/Images/Products/" + img.TenHinh)" />
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Card phải: thông tin sản phẩm -->
+        <div class="col-lg-6">
+            <div class="card shadow-sm p-4 rounded-4">
+                <h2 class="fw-bold">@Model.TenSP</h2>
+
+                <p class="fw-bold fs-2" style="color: red">@String.Format("{0:N0}₫", Model.Gia)</p>
+
+                <ul class="list-unstyled mb-3" style="line-height:1.9;">
+                    <li><strong>Loại:</strong> @Model.DanhMuc.TenDanhMuc</li>
+                    <li><strong>Chất liệu:</strong> @Model.ChatLieu</li>
+                    <li><strong>Form:</strong> @Model.Form</li>
+                </ul>
+
+                <h6 class="fw-bold">
+                    Màu sắc: <span id="selectedColor">@((ViewBag.MauSac != null && ViewBag.MauSac.Count > 0) ? ViewBag.MauSac[0] : "")</span>
+                </h6>
+
+                <div class="d-flex gap-2 mb-3 flex-wrap" id="colorArea">
+                    @foreach (var mau in ViewBag.MauSac)
+                    {
+                        <span class="px-3 py-1 border rounded color-item" data-color="@mau" style="cursor:pointer;">@mau</span>
+                    }
+                </div>
+
+                @if (ViewBag.CoSize == true)
+                {
+                    <h6 class="fw-bold">
+                        Kích thước: <span id="selectedSize">@((ViewBag.SizeTheoMau.Count > 0) ? ViewBag.SizeTheoMau[0] : "")</span>
+                    </h6>
+
+                    <div class="d-flex gap-2 mb-3 flex-wrap" id="sizeArea">
+                        @foreach (var size in ViewBag.SizeTheoMau)
+                        {
+                            <span class="px-3 py-1 border rounded size-item @(size == ViewBag.SizeTheoMau[0] ? "active" : "")" data-size="@size" style="cursor:pointer;">@size</span>
+                        }
+                    </div>
+                }
+
+                <div class="d-flex align-items-center mb-4">
+                    <button class="btn btn-outline-dark" onclick="minus()">-</button>
+                    <input id="qty" value="1" class="form-control text-center mx-2" style="width:70px;" />
+                    <button class="btn btn-outline-dark" onclick="plus()">+</button>
+                </div>
+
+                <div class="d-flex gap-3 flex-wrap justify-content-center">
+                    @Html.AntiForgeryToken()
+                    <button class="btn btn-outline-dark btn-addcart px-4 py-2 fw-bold rounded-3" id="btnAddCart">THÊM GIỎ HÀNG</button>
+                    <button class="btn btn-outline-dark px-4 py-2 fw-bold rounded-3" id="btnBuyNow">MUA NGAY</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Tab mô tả + chính sách giao hàng + chính sách đổi hàng -->
+<ul class="nav nav-tabs rounded-top" id="policyTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link rounded-top active" id="desc-tab" data-bs-toggle="tab" data-bs-target="#desc" type="button">
+            MÔ TẢ CHI TIẾT
+        </button>
+    </li>
+
+    <li class="nav-item" role="presentation">
+        <button class="nav-link rounded-top" id="ship-tab" data-bs-toggle="tab" data-bs-target="#ship" type="button">
+            CHÍNH SÁCH GIAO HÀNG
+        </button>
+    </li>
+
+    <li class="nav-item" role="presentation">
+        <button class="nav-link rounded-top" id="return-tab" data-bs-toggle="tab" data-bs-target="#return" type="button">
+            CHÍNH SÁCH ĐỔI HÀNG
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content p-4 border border-top-0 rounded-bottom shadow-sm" id="policyTabsContent">
+    <div class="tab-pane fade show active" id="desc">
+        <div style="line-height:1.8;">
+            @Html.Raw(Model.MoTaChiTiet)
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="ship">
+        <img src="/Images/ChinhSach_GiaoHang_DoiHang/chinh-sach-giao-hang.jpg" class="img-fluid rounded" />
+    </div>
+
+    <div class="tab-pane fade text-center" id="return">
+        <img src="/Images/ChinhSach_GiaoHang_DoiHang/chinh-sach-doi-hang.jpg" class="img-fluid rounded" />
+    </div>
+</div>
+
+<!-- Sản phẩm liên quan -->
+<div class="d-flex align-items-center justify-content-center my-4 new-title">
+    <div class="line-gradient"></div>
+    <h1 class="mx-3 fw-bold title-black">SẢN PHẨM LIÊN QUAN</h1>
+    <div class="line-gradient"></div>
+</div>
+
+<div class="position-relative my-4">
+    <button class="related-btn left" onclick="slideRelated(-1)">
+        <i class="bi bi-chevron-left"></i>
+    </button>
+
+    <div id="relatedWrapper" class="related-wrapper">
+        <div id="relatedTrack" class="related-track">
+            @foreach (var sp in ViewBag.SP_LienQuan as IEnumerable<WebShopQuanAo.Models.SanPham>)
+            {
+                var anhHover = sp.HinhAnhSanPhams?.FirstOrDefault(h => h.ThuTuHinh == 2)?.TenHinh;
+
+                <div class="related-item">
+                    <div class="card shadow-sm border-0 product-card h-100">
+                        <a href="@Url.Action("ChiTietSanPham", "SanPham", new { id = sp.MaSP })" class="text-decoration-none text-dark">
+                            <div class="ratio ratio-1x1 product-image-wrapper">
+                                <img src="@Url.Content("~/Images/Products/" + sp.HinhDaiDien)" class="img-main" />
+                                <img src="@Url.Content(anhHover != null ? "~/Images/Products/" + anhHover : "~/Images/Products/" + sp.HinhDaiDien)" class="img-hover" />
+                            </div>
+                        </a>
+
+                        <div class="card-body text-start d-flex flex-column">
+                            <a href="@Url.Action("ChiTietSanPham", "SanPham", new { id = sp.MaSP })" class="text-dark text-decoration-none">
+                                <h6 class="product-name">@sp.TenSP</h6>
+                            </a>
+
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <p class="fw-bold m-0" style="color:red; font-size:15px">
+                                    @String.Format("{0:N0}₫", sp.Gia)
+                                </p>
+                                <a href="@Url.Action("ChiTietSanPham", "SanPham", new { id = sp.MaSP })"
+                                   class="text-dark">
+                                    <i class="bi bi-cart-plus fs-5 cart-icon"></i>
+                                </a>
+                            </div>
+
+                            <a href="@Url.Action("ChiTietSanPham", "SanPham", new { id = sp.MaSP })" class="btn btn-outline-dark btn-sm fw-bold mt-auto btn-view rounded-3">
+                                XEM CHI TIẾT
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <button class="related-btn right" onclick="slideRelated(1)">
+        <i class="bi bi-chevron-right"></i>
+    </button>
+</div>
+
+<!-- Toast thông báo thêm vào giỏ hàng -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 1055;">
+    <div id="cartToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                Sản phẩm đã được thêm vào giỏ hàng!
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+<script>
+    //Danh sách hình (không bị trùng)
+    var images = @Html.Raw(Json.Encode(Model.HinhAnhSanPhams.OrderBy(x => x.ThuTuHinh).Select(h => Url.Content("~/Images/Products/" + h.TenHinh))));
+
+    var currentIndex = 0;
+
+    var mainImage = document.getElementById("mainImage");
+    var thumbs = document.querySelectorAll(".img-thumb");
+
+    //Cập nhật ảnh lớn + kéo danh sách ảnh phụ
+    function updateMainImage() {
+        mainImage.style.opacity = 0;
+
+        setTimeout(() => {
+            mainImage.src = images[currentIndex];
+            mainImage.style.opacity = 1;
+        }, 200);
+
+        thumbs.forEach((t, i) => {
+            t.classList.toggle("active", i === currentIndex);
+        });
+
+        scrollThumbToView(currentIndex);
+    }
+
+    //Xử lý click ảnh phụ
+    thumbs.forEach((thumb, index) => {
+        thumb.addEventListener("click", () => {
+            currentIndex = index;
+            updateMainImage();
+        });
+    });
+
+    //Kéo ảnh phụ vào giữa 
+    function scrollThumbToView(index) {
+        let container = document.querySelector(".thumb-scroll");
+        let target = thumbs[index];
+
+        if (!container || !target) return;
+
+        container.scrollTo({
+            left: target.offsetLeft - container.clientWidth / 2 + target.clientWidth / 2,
+            behavior: "smooth"
+        });
+    }
+
+    //Next ảnh
+    function nextImage() {
+        currentIndex = (currentIndex + 1) % images.length;
+        updateMainImage();
+    }
+
+    //Prev ảnh
+    function prevImage() {
+        currentIndex = (currentIndex - 1 + images.length) % images.length;
+        updateMainImage();
+    }
+
+    updateMainImage();
+
+    // Xử lý tăng giảm số lượng
+    function plus() {
+        let q = document.getElementById("qty");
+        q.value = parseInt(q.value) + 1;
+    }
+
+    function minus() {
+        let q = document.getElementById("qty");
+        let v = parseInt(q.value);
+        if (v > 1) q.value = v - 1;
+    }
+
+    //Chặn nhập 0 
+    document.getElementById("qty").addEventListener("input", function () {
+        let v = this.value.replace(/\D/g, ""); 
+
+        if (v === "" || v === "0") {
+            this.value = "1";
+        } else {
+            this.value = parseInt(v);
+        }
+    });
+
+    // Mất focus tự sửa số ko hợp lệ về 1
+    document.getElementById("qty").addEventListener("blur", function () {
+        let v = parseInt(this.value);
+        if (isNaN(v) || v < 1) {
+            this.value = 1;
+        }
+    });
+
+    //Xử lý chọn màu
+     var coSize = @((ViewBag.CoSize == true) ? "true" : "false");
+
+    document.querySelectorAll(".color-item").forEach(el => {
+        el.addEventListener("click", function () {
+
+            document.querySelectorAll(".color-item").forEach(x => x.classList.remove("active"));
+            this.classList.add("active");
+
+            let color = this.dataset.color;
+            document.getElementById("selectedColor").innerText = color;
+
+            //Lấy size
+            if (coSize === "true") {
+               fetch('/SanPham/GetSizeTheoMau?maSP=@Model.MaSP&mau=' + color)
+                    .then(res => res.json())
+                    .then(data => {
+                        //render size
+                        let html = "";
+                        data.forEach((s, index) => {
+                            html += `
+                                <span class="px-3 py-1 border rounded size-item ${index === 0 ? "active" : ""}"data-size="${s}" style="cursor:pointer;">${s}</span>
+                            `;
+                        });
+
+                        // Render ra giao diện
+                        document.getElementById("sizeArea").innerHTML = html;
+
+                        // Cập nhật size mặc định
+                        document.getElementById("selectedSize").innerText = data.length > 0 ? data[0] : "";
+
+                        // Cho phép click size
+                        registerSizeClick();
+                    });
+
+            }
+        });
+    });
+
+    //Chon size
+    function registerSizeClick() {
+        document.querySelectorAll(".size-item").forEach(el => {
+            el.addEventListener("click", function () {
+                document.querySelectorAll(".size-item").forEach(x => x.classList.remove("active"));
+
+                this.classList.add("active");
+
+                document.getElementById("selectedSize").innerText = this.dataset.size;
+            });
+        });
+    }
+
+    registerSizeClick();
+
+
+    //Sản phẩm liên quan
+    let offset = 0;
+    let visible = getVisibleCount();
+
+    const track = document.getElementById("relatedTrack");
+    const wrapper = document.getElementById("relatedWrapper");
+
+    function getVisibleCount() {
+        const width = window.innerWidth;
+
+        if (width < 576) return 1;     
+        if (width < 768) return 2;      
+        if (width < 992) return 3;      
+        if (width < 1200) return 4;     
+        return 5;                      
+    }
+
+    function slideRelated(direction) {
+        const itemWidth = track.children[0].offsetWidth + 16;
+        const totalItems = track.children.length;
+
+        visible = getVisibleCount();
+
+        const maxOffset = Math.max(totalItems - visible, 0);
+
+        offset += direction;
+
+        if (offset < 0) offset = 0;
+        if (offset > maxOffset) offset = maxOffset;
+
+        track.style.transform = `translateX(-${offset * itemWidth}px)`;
+    }
+
+    //Cập nhật slider khi thay đổi kích thước màn hình
+    window.addEventListener("resize", () => {
+        visible = getVisibleCount();
+
+        const totalItems = track.children.length;
+        const maxOffset = Math.max(totalItems - visible, 0);
+
+        if (offset > maxOffset) offset = maxOffset;
+
+        const itemWidth = track.children[0].offsetWidth + 16;
+        track.style.transform = `translateX(-${offset * itemWidth}px)`;
+    });
+
+    //Thêm giỏ hàng
+    document.getElementById("btnAddCart").addEventListener("click", function () {
+        let qty = parseInt(document.getElementById("qty").value);
+        let color = document.getElementById("selectedColor").innerText.trim();
+        let size = document.getElementById("selectedSize") ? document.getElementById("selectedSize").innerText.trim() : null;
+
+        if (!color || color === "") {
+            alert("Vui lòng chọn màu!");
+            return;
+        }
+
+        if (@(ViewBag.CoSize ? "true" : "false") && (!size || size === "")) {
+            alert("Vui lòng chọn size!");
+            return;
+        }
+
+        const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+        const formData = new FormData();
+        formData.append("maSP", @Model.MaSP);
+        formData.append("mau", color);
+        formData.append("size", size);
+        formData.append("soLuong", qty);
+        formData.append("__RequestVerificationToken", token);
+
+        fetch("/GioHang/ThemGioHang", {
+            method: "POST",
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === "ok") {
+                // Hiện toast
+                var toastEl = document.getElementById('cartToast');
+                var toast = new bootstrap.Toast(toastEl);
+                toast.show();
+
+                // Cập nhật icon giỏ hàng
+                const cartCountEl = document.getElementById("cartCount");
+                if (cartCountEl) {
+                    cartCountEl.innerText = data.soLuongTong;
+                }
+            } else {
+                alert("Có lỗi xảy ra, vui lòng thử lại!");
+            }
+        })
+        .catch(err => console.error(err));
+    });
+
+    //Xử lý mua ngay
+    document.getElementById("btnBuyNow").addEventListener("click", function () {
+        let qty = parseInt(document.getElementById("qty").value);
+        let color = document.getElementById("selectedColor").innerText.trim();
+        let size = document.getElementById("selectedSize")
+            ? document.getElementById("selectedSize").innerText.trim()
+            : null;
+
+        if (!color || color === "") {
+            alert("Vui lòng chọn màu!");
+            return;
+        }
+
+        if (@(ViewBag.CoSize ? "true" : "false") && (!size || size === "")) {
+            alert("Vui lòng chọn size!");
+            return;
+        }
+
+        window.location.href = `/GioHang/MuaNgay?maSP=@Model.MaSP&mau=${color}&size=${size}&sl=${qty}`;
+    });
+</script>
+
+
+
+

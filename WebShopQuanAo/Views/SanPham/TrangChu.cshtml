@@ -1,0 +1,274 @@
+﻿@model IEnumerable<WebShopQuanAo.Models.SanPham>
+
+@{
+    ViewBag.Title = "Trang chủ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Banner chuyển động -->
+<div id="bannerCarousel" class="carousel slide rounded-5 overflow-hidden" data-bs-ride="carousel" data-bs-interval="3000">
+    <div class="carousel-indicators">
+        <button type="button" data-bs-target="#bannerCarousel" data-bs-slide-to="0" class="active"></button>
+        <button type="button" data-bs-target="#bannerCarousel" data-bs-slide-to="1"></button>
+        <button type="button" data-bs-target="#bannerCarousel" data-bs-slide-to="2"></button>
+        <button type="button" data-bs-target="#bannerCarousel" data-bs-slide-to="3"></button>
+        <button type="button" data-bs-target="#bannerCarousel" data-bs-slide-to="4"></button>
+    </div>
+
+    <div class="carousel-inner">
+        <div class="carousel-item active">
+            <img src="~/Images/Banners/hang-moi-banner.jpg" class="d-block w-100" />
+        </div>
+
+        <div class="carousel-item">
+            <img src="~/Images/Banners/banner1.jpg" class="d-block w-100" />
+        </div>
+
+        <div class="carousel-item">
+            <img src="~/Images/Banners/banner2.jpg" class="d-block w-100" />
+        </div>
+
+        <div class="carousel-item">
+            <img src="~/Images/Banners/banner4.jpg" class="d-block w-100" />
+        </div>
+
+        <div class="carousel-item">
+            <img src="~/Images/Banners/banner3.jpg" class="d-block w-100" />
+        </div>
+    </div>
+
+    <button class="carousel-control-prev" type="button" data-bs-target="#bannerCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+    </button>
+
+    <button class="carousel-control-next" type="button" data-bs-target="#bannerCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+    </button>
+</div>
+
+<!-- Hàng mới + hàng bán chạy + áo nam + quần nam + phụ kiện -->
+<div class="d-flex align-items-center justify-content-center my-4 new-title">
+    <div class="line-gradient"></div>
+    <h1 class="mx-3 fw-bold title-black">HÀNG MỚI</h1>
+    <div class="line-gradient"></div>
+</div>
+
+<div class="my-4">
+    <img src="~/Images/Banners/hang-moi-banner-trang-chu.jpg" class="w-100 rounded-5 shadow-sm" alt="Banner Hàng Mới" />
+</div>
+
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-4">
+    @foreach (var sp in ViewBag.HangMoi as IEnumerable<WebShopQuanAo.Models.SanPham>)
+    {
+        var anhHover = sp.HinhAnhSanPhams?.FirstOrDefault(h => h.ThuTuHinh == 2)?.TenHinh;
+
+        <div class="col">
+            <div class="card shadow-sm border-0 product-card h-100">
+                <a href="@Url.Action("ChiTietSanPham", "SanPham", new { id = sp.MaSP })" class="text-decoration-none text-dark">
+                    <div class="ratio ratio-1x1 product-image-wrapper">
+                        <img src="@Url.Content("~/Images/Products/" + sp.HinhDaiDien)" class="img-main" />
+                        <img src="@Url.Content(anhHover != null ? "~/Images/Products/" + anhHover : "~/Images/Products/" + sp.HinhDaiDien)" class="img-hover" />
+                    </div>
+                </a>
+
+                <div class="card-body text-start d-flex flex-column">
+                    <a href="@Url.Action("ChiTietSanPham", "SanPham", new { id = sp.MaSP })" class="text-dark text-decoration-none">
+                        <h6 class="product-name">@sp.TenSP</h6>
+                    </a>
+
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <p class="fw-bold m-0" style="color:red; font-size:15px">@String.Format("{0:N0}₫", sp.Gia)</p>
+                        <a href="@Url.Action("ChiTietSanPham", "SanPham", new { id = sp.MaSP })" class="text-dark"><i class="bi bi-cart-plus fs-5 cart-icon"></i></a>
+                    </div>
+
+                    <a href="@Url.Action("ChiTietSanPham", "SanPham", new { id = sp.MaSP })" class="btn btn-outline-dark btn-sm fw-bold mt-auto btn-view rounded-3">XEM CHI TIẾT</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="text-center mt-4">
+    <a href="@Url.Action("DanhSachSanPham", "SanPham", new { slug = "hang-moi" })" class="btn btn-all fw-bold px-4 py-2 rounded-3">XEM TẤT CẢ <i class="bi bi-chevron-double-right"></i></a>
+</div>
+
+<div class="d-flex align-items-center justify-content-center my-4 new-title">
+    <div class="line-gradient"></div>
+    <h1 class="mx-3 fw-bold title-black">HÀNG BÁN CHẠY</h1>
+    <div class="line-gradient"></div>
+</div>
+
+<div class="my-4">
+    <img src="~/Images/Banners/hang-ban-chay-banner-trang-chu.jpg" class="w-100 rounded-5 shadow-sm" alt="Banner Hàng Bán Chạy" />
+</div>
+
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-4">
+    @foreach (var sp in ViewBag.HangBanChay as IEnumerable<WebShopQuanAo.Models.SanPham>)
+    {
+        var anhHover = sp.HinhAnhSanPhams?.FirstOrDefault(h => h.ThuTuHinh == 2)?.TenHinh;
+
+        <div class="col">
+            <div class="card shadow-sm border-0 product-card h-100">
+                <a href="@Url.Action("ChiTietSanPham", "SanPham", new { id = sp.MaSP })" class="text-decoration-none text-dark">
+                    <div class="ratio ratio-1x1 product-image-wrapper">
+                        <img src="@Url.Content("~/Images/Products/" + sp.HinhDaiDien)" class="img-main" />
+                        <img src="@Url.Content(anhHover != null ? "~/Images/Products/" + anhHover : "~/Images/Products/" + sp.HinhDaiDien)" class="img-hover" />
+                    </div>
+                </a>
+
+                <div class="card-body text-start d-flex flex-column">
+                    <a href="@Url.Action("ChiTietSanPham", "SanPham", new { id = sp.MaSP })" class="text-dark text-decoration-none">
+                        <h6 class="product-name">@sp.TenSP</h6>
+                    </a>
+
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <p class="fw-bold m-0" style="color:red; font-size:15px">@String.Format("{0:N0}₫", sp.Gia)</p>
+                        <a href="@Url.Action("ChiTietSanPham", "SanPham", new { id = sp.MaSP })" class="text-dark"><i class="bi bi-cart-plus fs-5 cart-icon"></i></a>
+                    </div>
+
+                    <a href="@Url.Action("ChiTietSanPham", "SanPham", new { id = sp.MaSP })" class="btn btn-outline-dark btn-sm fw-bold mt-auto btn-view rounded-3">XEM CHI TIẾT</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="text-center mt-4">
+    <a href="@Url.Action("DanhSachSanPham", "SanPham", new { slug = "hang-ban-chay" })" class="btn btn-all fw-bold px-4 py-2 rounded-3">XEM TẤT CẢ <i class="bi bi-chevron-double-right"></i></a>
+</div>
+
+<div class="d-flex align-items-center justify-content-center my-4 new-title">
+    <div class="line-gradient"></div>
+    <h1 class="mx-3 fw-bold title-black">ÁO NAM</h1>
+    <div class="line-gradient"></div>
+</div>
+
+<div class="my-4">
+    <img src="~/Images/Banners/ao-banner.jpg" class="w-100 rounded-5 shadow-sm" alt="Banner Áo Nam" />
+</div>
+
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-4">
+    @foreach (var sp in ViewBag.DanhSachAo as IEnumerable<WebShopQuanAo.Models.SanPham>)
+    {
+        var anhHover = sp.HinhAnhSanPhams?.FirstOrDefault(h => h.ThuTuHinh == 2)?.TenHinh;
+
+        <div class="col">
+            <div class="card shadow-sm border-0 product-card h-100">
+                <a href="@Url.Action("ChiTietSanPham", "SanPham", new { id = sp.MaSP })" class="text-decoration-none text-dark">
+                    <div class="ratio ratio-1x1 product-image-wrapper">
+                        <img src="@Url.Content("~/Images/Products/" + sp.HinhDaiDien)" class="img-main" />
+                        <img src="@Url.Content(anhHover != null ? "~/Images/Products/" + anhHover : "~/Images/Products/" + sp.HinhDaiDien)" class="img-hover" />
+                    </div>
+                </a>
+
+                <div class="card-body text-start d-flex flex-column">
+                    <a href="@Url.Action("ChiTietSanPham", "SanPham", new { id = sp.MaSP })" class="text-dark text-decoration-none">
+                        <h6 class="product-name">@sp.TenSP</h6>
+                    </a>
+
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <p class="fw-bold m-0" style="color:red; font-size:15px">@String.Format("{0:N0}₫", sp.Gia)</p>
+                        <a href="@Url.Action("ChiTietSanPham", "SanPham", new { id = sp.MaSP })" class="text-dark"><i class="bi bi-cart-plus fs-5 cart-icon"></i></a>
+                    </div>
+
+                    <a href="@Url.Action("ChiTietSanPham", "SanPham", new { id = sp.MaSP })" class="btn btn-outline-dark btn-sm fw-bold mt-auto btn-view rounded-3">XEM CHI TIẾT</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="text-center mt-4">
+    <a href="@Url.Action("DanhSachSanPham", "SanPham", new { slug = "ao" })" class="btn btn-all fw-bold px-4 py-2 rounded-3">XEM TẤT CẢ <i class="bi bi-chevron-double-right"></i></a>
+</div>
+
+<div class="d-flex align-items-center justify-content-center my-4 new-title">
+    <div class="line-gradient"></div>
+    <h1 class="mx-3 fw-bold title-black">QUẦN NAM</h1>
+    <div class="line-gradient"></div>
+</div>
+
+<div class="my-4">
+    <img src="~/Images/Banners/quan-banner.jpg" class="w-100 rounded-5 shadow-sm" alt="Banner Quần Nam" />
+</div>
+
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-4">
+    @foreach (var sp in ViewBag.DanhSachQuan as IEnumerable<WebShopQuanAo.Models.SanPham>)
+    {
+        var anhHover = sp.HinhAnhSanPhams?.FirstOrDefault(h => h.ThuTuHinh == 2)?.TenHinh;
+
+        <div class="col">
+            <div class="card shadow-sm border-0 product-card h-100">
+                <a href="@Url.Action("ChiTietSanPham", "SanPham", new { id = sp.MaSP })"
+                   class="text-decoration-none text-dark">
+                    <div class="ratio ratio-1x1 product-image-wrapper">
+                        <img src="@Url.Content("~/Images/Products/" + sp.HinhDaiDien)" class="img-main" />
+                        <img src="@Url.Content(anhHover != null ? "~/Images/Products/" + anhHover : "~/Images/Products/" + sp.HinhDaiDien)" class="img-hover" />
+                    </div>
+                </a>
+
+                <div class="card-body text-start d-flex flex-column">
+                    <a href="@Url.Action("ChiTietSanPham", "SanPham", new { id = sp.MaSP })" class="text-dark text-decoration-none">
+                        <h6 class="product-name">@sp.TenSP</h6>
+                    </a>
+
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <p class="fw-bold m-0" style="color:red; font-size:15px">@String.Format("{0:N0}₫", sp.Gia)</p>
+                        <a href="@Url.Action("ChiTietSanPham", "SanPham", new { id = sp.MaSP })" class="text-dark"><i class="bi bi-cart-plus fs-5 cart-icon"></i></a>
+                    </div>
+
+                    <a href="@Url.Action("ChiTietSanPham", "SanPham", new { id = sp.MaSP })" class="btn btn-outline-dark btn-sm fw-bold mt-auto btn-view rounded-3">XEM CHI TIẾT</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="text-center mt-4">
+    <a href="@Url.Action("DanhSachSanPham", "SanPham", new { slug = "quan" })" class="btn btn-all fw-bold px-4 py-2 rounded-3">XEM TẤT CẢ <i class="bi bi-chevron-double-right"></i></a>
+</div>
+
+<div class="d-flex align-items-center justify-content-center my-4 new-title">
+    <div class="line-gradient"></div>
+    <h1 class="mx-3 fw-bold title-black">PHỤ KIỆN</h1>
+    <div class="line-gradient"></div>
+</div>
+
+<div class="my-4">
+    <img src="~/Images/Banners/phu-kien-banner.jpg" class="w-100 rounded-5 shadow-sm" alt="Banner Phụ Kiện" />
+</div>
+
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-4">
+    @foreach (var sp in ViewBag.DanhSachPhuKien as IEnumerable<WebShopQuanAo.Models.SanPham>)
+    {
+        var anhHover = sp.HinhAnhSanPhams?.FirstOrDefault(h => h.ThuTuHinh == 2)?.TenHinh;
+
+        <div class="col">
+            <div class="card shadow-sm border-0 product-card h-100">
+                <a href="@Url.Action("ChiTietSanPham", "SanPham", new { id = sp.MaSP })" class="text-decoration-none text-dark">
+                    <div class="ratio ratio-1x1 product-image-wrapper">
+                        <img src="@Url.Content("~/Images/Products/" + sp.HinhDaiDien)" class="img-main" />
+                        <img src="@Url.Content(anhHover != null ? "~/Images/Products/" + anhHover : "~/Images/Products/" + sp.HinhDaiDien)" class="img-hover" />
+                    </div>
+                </a>
+
+                <div class="card-body text-start d-flex flex-column">
+                    <a href="@Url.Action("ChiTietSanPham", "SanPham", new { id = sp.MaSP })" class="text-dark text-decoration-none">
+                        <h6 class="product-name">@sp.TenSP</h6>
+                    </a>
+
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <p class="fw-bold m-0" style="color:red; font-size:15px">@String.Format("{0:N0}₫", sp.Gia)</p>
+                        <a href="@Url.Action("ChiTietSanPham", "SanPham", new { id = sp.MaSP })" class="text-dark"><i class="bi bi-cart-plus fs-5 cart-icon"></i></a>
+                    </div>
+
+                    <a href="@Url.Action("ChiTietSanPham", "SanPham", new { id = sp.MaSP })" class="btn btn-outline-dark btn-sm fw-bold mt-auto btn-view rounded-3">XEM CHI TIẾT</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="text-center mt-4">
+    <a href="@Url.Action("DanhSachSanPham", "SanPham", new { slug = "phu-kien" })" class="btn btn-all fw-bold px-4 py-2 rounded-3">XEM TẤT CẢ <i class="bi bi-chevron-double-right"></i></a>
+</div>

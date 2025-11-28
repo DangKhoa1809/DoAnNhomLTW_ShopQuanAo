@@ -1,0 +1,263 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    <link rel="stylesheet" href="~/Content/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="~/Content/CSS.css" />
+</head>
+<body>
+    <div class="sticky-top" style="z-index:1050;">
+        <!-- Header -->
+        <header class="bg-black py-2">
+            <div class="container d-flex align-items-center justify-content-between">
+                <a href="@Url.Action("TrangChu","SanPham")" class="d-flex align-items-center mx-2">
+                    <img src="~/Images/Logo/logoShopQuanAo.jpg" alt="Logo" style="height:60px;">
+                </a>
+
+                <form class="header-search d-none d-lg-flex flex-grow-1 mx-4" action="@Url.Action("TimKiem","SanPham")" method="get" style="max-width: 600px;">
+                    <div class="input-group">
+                        <input name="keyword" type="text" class="form-control" placeholder="Bạn đang tìm gì...">
+                        <button class="btn btn-outline-light" type="submit"><i class="bi bi-search"></i></button>
+                    </div>
+                </form>
+
+                <div class="d-flex align-items-center text-white">
+                    <a class="d-lg-none mx-2 text-white" id="btnSearchMobile">
+                        <i class="bi bi-search fs-4 link-light hover-scale hover-lift"></i>
+                    </a>
+
+                    <a href="@Url.Action("GioiThieu","SanPham")" class="text-white mx-2 mx-lg-3 text-center text-decoration-none link-light hover-scale hover-lift">
+                        <i class="bi bi-shop fs-4"></i>
+                        <div class="d-none d-lg-block">Cửa hàng</div>
+                    </a>
+
+                    @if (Session["LoaiNV"] != null && (Session["LoaiNV"].ToString() == "Admin" || Session["LoaiNV"].ToString() == "Nhân viên"))
+                    {
+                        <a href="/Admin/TrangChuAdmin" class="text-white mx-2 mx-lg-3 text-center text-decoration-none link-light hover-scale hover-lift">
+                            <i class="bi bi-gear-fill fs-4"></i>
+                            <div class="d-none d-lg-block">Admin</div>
+                        </a>
+                    }
+
+                    <div class="d-flex align-items-center text-white">
+                        @if (Session["HoTenKH"] != null)
+                        {
+                            <a href="@Url.Action("DangXuat", "TaiKhoan")" class="text-white d-flex flex-column align-items-center link-light hover-scale hover-lift text-decoration-none">
+                                <span>Xin chào</span>
+                                <strong>@Session["HoTenKH"]!</strong>
+                                <i class="bi bi-box-arrow-right fs-4 mt-1"></i>
+                            </a>
+                        }
+                        else if (Session["HoTenNV"] != null)
+                        {
+                            <a href="@Url.Action("DangXuat", "TaiKhoan")" class="text-white d-flex flex-column align-items-center link-light hover-scale hover-lift text-decoration-none">
+                                <span>Xin chào</span>
+                                <strong>@Session["HoTenNV"]</strong>
+                                <small>(@Session["LoaiNV"])</small>
+                                <i class="bi bi-box-arrow-right fs-4 mt-1"></i>
+                            </a>
+                        }
+                        else
+                        {
+                            <a href="@Url.Action("DangNhap", "TaiKhoan")" class="text-white d-flex flex-column align-items-center link-light hover-scale hover-lift text-decoration-none">
+                                <i class="bi bi-person fs-4"></i>
+                                <div class="d-none d-lg-block">Đăng nhập</div>
+                            </a>
+                        }
+
+                    </div>
+
+                    <a href="@Url.Action("ThanhToan","GioHang")" class="text-white mx-3 position-relative text-center text-decoration-none link-light hover-scale hover-lift">
+                        <div class="position-relative d-inline-block">
+                            <i class="bi bi-cart3 fs-4"></i>
+                            <span id="cartCount" class="cart-badge">
+                                @(Session["Cart"] != null ? ((List<WebShopQuanAo.Models.CartItem>)Session["Cart"]).Sum(x => x.SoLuong) : 0)
+                            </span>
+                        </div>
+                        <div class="d-none d-lg-block">Giỏ hàng</div>
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Menu danh mục -->
+        <nav class="navbar navbar-expand-lg bg-white shadow-sm sticky-top">
+            <div class="container">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="mainNavbar">
+                    @Html.Partial("_MenuDanhMuc", (IEnumerable<WebShopQuanAo.Models.DanhMuc>)ViewBag.MenuCha)
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Main content-->
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-5 bg-black text-white pt-5 pb-4">
+        <div class="container">
+            <div class="row gy-4">
+                <div class="col-md-3">
+                    <h5 class="fw-bold mb-3 link-light hover-scale hover-lift">GIỚI THIỆU</h5>
+
+                    <a class="navbar-brand d-flex align-items-center mb-2" href="@Url.Action("TrangChu","SanPham")">
+                        <img src="~/Images/Logo/logoShopQuanAo.jpg" alt="Logo Shop" style="height:50px;">
+                    </a>
+
+                    <p class="mb-1 link-light hover-scale hover-lift">Shop Phân Phối Thời Trang Nam Chuẩn Hiệu</p>
+                    <p class="mb-1 link-light hover-scale hover-lift"><i class="bi bi-phone-vibrate me-2"></i>0908 998 999</p>
+                    <p class="mb-1 link-light hover-scale hover-lift"><i class="bi bi-envelope-at me-2"></i>fashion4men.com</p>
+                    <p class="mb-3 link-light hover-scale hover-lift"><i class="bi bi-clock me-2"></i>08:00 - 22:00</p>
+
+                    <div class="d-flex gap-3 mb-3">
+                        <a href="#" class="social-icon facebook fs-4">
+                            <i class="bi bi-facebook"></i>
+                        </a>
+
+                        <a href="#" class="social-icon instagram fs-4">
+                            <i class="bi bi-instagram"></i>
+                        </a>
+
+                        <a href="#" class="social-icon tiktok fs-4">
+                            <i class="bi bi-tiktok"></i>
+                        </a>
+
+                        <a href="#" class="social-icon youtube fs-4">
+                            <i class="bi bi-youtube"></i>
+                        </a>
+                    </div>
+
+                    <img src="~/Images/Logo/logo.jpg" alt="Logo" style="height:50px;">
+                </div>
+
+                <div class="col-md-3">
+                    <h5 class="fw-bold mb-3 link-light hover-scale hover-lift">CHÍNH SÁCH</h5>
+
+                    <ul>
+                        <li>
+                            <a href="#" class="text-white text-decoration-none d-block py-1 link-light hover-scale hover-lift">
+                                Hướng dẫn đặt hàng
+                            </a>
+                        </li>
+
+                        <li class="mt-2">
+                            <button class="btn btn-link text-white p-0 d-flex align-items-center collapsed text-decoration-none link-light hover-scale hover-lift" data-bs-toggle="collapse" data-bs-target="#cs-submenu" aria-expanded="false" aria-controls="cs-submenu">
+                                <span>Chính sách</span>
+                                <i class="bi bi-chevron-down ms-2"></i>
+                            </button>
+
+                            <ul id="cs-submenu" class="collapse mt-2 ps-3">
+                                <li><a href="#" class="text-white text-decoration-none d-block py-1 link-light hover-scale hover-lift">Ưu đãi sinh nhật</a></li>
+                                <li><a href="#" class="text-white text-decoration-none d-block py-1 link-light hover-scale hover-lift">Khách hàng thân thiết</a></li>
+                                <li><a href="#" class="text-white text-decoration-none d-block py-1 link-light hover-scale hover-lift">Chính sách giao hàng</a></li>
+                                <li><a href="#" class="text-white text-decoration-none d-block py-1 link-light hover-scale hover-lift">Chính sách bảo mật</a></li>
+                                <li><a href="#" class="text-white text-decoration-none d-block py-1 link-light hover-scale hover-lift">Đổi trả & bảo hành</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="col-md-3">
+                    <h5 class="fw-bold mb-3 link-light hover-scale hover-lift">ĐỊA CHỈ SHOP</h5>
+
+                    <p class="fw-bold mb-1 link-light hover-scale hover-lift"><i class="bi bi-geo-alt"></i> TP. HỒ CHÍ MINH</p>
+                    <p class="mb-0 link-light hover-scale hover-lift">140 Lê Trọng Tấn, Phường Tây Thạnh, TP.HCM</p>
+                </div>
+
+                <div class="col-md-3">
+                    <h5 class="fw-bold mb-3 link-light hover-scale hover-lift">PHƯƠNG THỨC THANH TOÁN</h5>
+
+                    <ul class="list-unstyled mt-3">
+                        <li class="mb-2 d-flex align-items-center link-light hover-scale hover-lift">
+                            <i class="bi bi-cash-coin me-2 fs-5"></i>
+                            <span>Thanh toán khi nhận hàng (COD)</span>
+                        </li>
+
+                        <li class="mb-2 d-flex align-items-center link-light hover-scale hover-lift">
+                            <i class="bi bi-credit-card-2-front me-2 fs-5"></i>
+                            <span>Chuyển khoản ngân hàng</span>
+                        </li>
+
+                        <li class="d-flex align-items-center link-light hover-scale hover-lift">
+                            <i class="bi bi-bank me-2 fs-5"></i>
+                            <span>ATM / Internet Banking</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <hr class="border-secondary mt-4" />
+
+            <p class="mb-0 text-center small link-light hover-scale hover-lift">© 2025 Fashion 4Men. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="~/Scripts/bootstrap.bundle.min.js"></script>
+
+    <script src="~/Scripts/jquery-3.7.0.min.js"></script>
+
+    <script>
+        //Menu danh mục
+        document.addEventListener("click", function (e) {
+            if (e.target.closest(".dropdown-menu a")) {
+                document.querySelectorAll(".dropdown-menu.show")
+                    .forEach(m => m.classList.remove("show"));
+            }
+        });
+    </script>
+
+    <script>
+        // MOBILE: click mở submenu
+        document.addEventListener("DOMContentLoaded", function () {
+            if (window.innerWidth <= 991) {
+                document.querySelectorAll('.dropdown-toggle').forEach(function (toggle) {
+
+                    toggle.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        let menu = this.nextElementSibling;
+
+                        document.querySelectorAll('.dropdown-menu.show').forEach(function (m) {
+                            if (m !== menu) m.classList.remove("show");
+                        });
+
+                        menu.classList.toggle("show");
+                    });
+                });
+            }
+
+        });
+    </script>
+
+    <script>
+        //Lưu vị trí khi bấm XEM THÊM
+        document.querySelector(".btn-load-more")?.addEventListener("click", function () {
+            sessionStorage.setItem("scrollPos", window.scrollY);
+        });
+    </script>
+
+    <script>
+        //Cuộn về vị trí cũ khi bấm XEM THÊM
+        document.addEventListener("DOMContentLoaded", function () {
+            let pos = sessionStorage.getItem("scrollPos");
+            if (pos) {
+                window.scrollTo(0, pos);
+                sessionStorage.removeItem("scrollPos");
+            }
+        });
+    </script>
+</body>
+</html>
